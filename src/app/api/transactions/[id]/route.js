@@ -3,8 +3,9 @@ import Transaction from "@/model/Transactions.model";
 import { createApiResponse } from "@/lib/apiResponse";
 import { updateTransactionSchema } from "@/schemas/updateTransactionSchema";
 
-export async function PUT(req, { params }) {
+export async function PUT(req, context) {
   await dbConnect();
+  const { params } = await context;
 
   try {
     const body = await req.json();
@@ -33,8 +34,9 @@ export async function PUT(req, { params }) {
   }
 }
 
-export async function DELETE(req, { params }) {
+export async function DELETE(req, context) {
   await dbConnect();
+  const { params } = await context;
 
   try {
     await Transaction.findByIdAndDelete(params.id);

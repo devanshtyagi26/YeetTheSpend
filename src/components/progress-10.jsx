@@ -1,8 +1,8 @@
 "use client";
-import * as React from "react";
-
+import { useEffect, useCallback, useState } from "react";
 // import { Slider } from "@/components/ui/slider";
 import { cn } from "@/lib/utils";
+import axios from "axios";
 
 const CircularProgress = ({
   total,
@@ -19,8 +19,10 @@ const CircularProgress = ({
 }) => {
   const radius = size / 2 - 10;
   const circumference = Math.ceil(3.14 * radius * 2);
-  const val = (spent / total) * 100;
-  const percentage = Math.ceil(circumference * ((100 - val) / 100));
+  const val = total > 0 ? (spent / total) * 100 : 0;
+
+  const percentage =
+    total > 0 ? Math.ceil(circumference * ((100 - val) / 100)) : circumference;
 
   const viewBox = `-${size * 0.125} -${size * 0.125} ${size * 1.25} ${
     size * 1.25
@@ -80,16 +82,39 @@ const CircularProgress = ({
 };
 
 export default function CircularProgressColorDemo() {
-  const [total, setTotal] = React.useState([13000]);
-  const [spent, setSpent] = React.useState([6500]);
+  const [total, setTotal] = useState(0);
+  const [spent, setSpent] = useState(0);
   const size = 200;
+
+  const fetchBudget = useCallback(async () => {
+    try {
+      const res = await axios.get("/api/budget");
+      console.log(res.data.budget);
+      setTotal(res.data.budget);
+      setSpent(res.data.spent);
+    } catch (err) {
+      console.error("Error fetching message settings");
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchBudget();
+  }, [fetchBudget]);
+
+  if (total === 0) {
+    return (
+      <div className="text-center text-sm text-muted-foreground">
+        Loading budget data...
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-xs mx-auto w-full flex flex-col items-center">
       <div className="flex items-center gap-1">
         <CircularProgress
-          total={total[0]}
-          spent={spent[0]}
+          total={total}
+          spent={spent}
           size={size}
           strokeWidth={size / 6}
           showLabel={true}

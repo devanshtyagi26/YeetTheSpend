@@ -2,7 +2,6 @@
 import { useEffect, useCallback, useState } from "react";
 // import { Slider } from "@/components/ui/slider";
 import { cn } from "@/lib/utils";
-import axios from "axios";
 
 const CircularProgress = ({
   total,
@@ -70,43 +69,22 @@ const CircularProgress = ({
             "absolute inset-0 flex flex-col items-center justify-center font-bold"
           )}
         >
-          <span className="text-2xl">
+          <span className="text-3xl relative top-1.5">
             {renderLabel ? renderLabel(spent) : spent}
           </span>
 
-          <span className="text-xs font-medium">Spent</span>
+          <span className="text-xs font-medium text-red-500">Spent</span>
         </div>
       )}
     </div>
   );
 };
 
-export default function CircularProgressColorDemo() {
-  const [total, setTotal] = useState(0);
-  const [spent, setSpent] = useState(0);
-  const size = 200;
-
-  const fetchBudget = useCallback(async () => {
-    try {
-      const res = await axios.get("/api/budget");
-      console.log(res.data.budget);
-      setTotal(res.data.budget);
-      setSpent(res.data.spent);
-    } catch (err) {
-      console.error("Error fetching message settings");
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchBudget();
-  }, [fetchBudget]);
-
+export default function CircularProgressColorDemo({ total, spent }) {
+  const size = 250;
+  console.log(total, spent);
   if (total === 0) {
-    return (
-      <div className="text-center text-sm text-muted-foreground">
-        Loading budget data...
-      </div>
-    );
+    return <></>;
   }
 
   return (
@@ -118,7 +96,11 @@ export default function CircularProgressColorDemo() {
           size={size}
           strokeWidth={size / 6}
           showLabel={true}
-          renderLabel={(spent) => `Rs. ${spent}`}
+          renderLabel={(spent) => {
+            return `Rs. ${spent
+              .toString()
+              .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
+          }}
           className="stroke-accent"
           progressClassName="stroke-accent-foreground"
         />

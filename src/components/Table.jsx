@@ -194,6 +194,14 @@ export const columns = [
   },
 ];
 
+// Filter function to only show transactions for the selected month
+const filterByMonth = (data, month) => {
+  return data.filter((item) => {
+    const transactionMonth = item.date.slice(0, 7); // Get "YYYY-MM" from the date
+    return transactionMonth === month; // Only return transactions for the given month
+  });
+};
+
 export default function DataTable({ month }) {
   console.log("Table Month", month);
   const [sorting, setSorting] = React.useState([]);
@@ -204,17 +212,28 @@ export default function DataTable({ month }) {
     { id: "type", value: "" }, // Default empty filter
   ]);
 
+  // Ensure filteredData is never undefined, fallback to an empty array
+  const filteredData = React.useMemo(() => filterByMonth(data, month), [month]);
+
   const table = useReactTable({
-    data,
+    data: filteredData, // <-- Use 'filteredData' here, not 'filteredData' directly in 'columns'
     columns,
+    state: {
+      columnFilters,
+      rowSelection,
+    },
     onColumnFiltersChange: setColumnFilters,
+    onRowSelectionChange: (newRowSelection) => {
+      setRowSelection(newRowSelection);
+      localStorage.setItem(
+        "rowSelectionState",
+        JSON.stringify(newRowSelection)
+      );
+    },
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    state: {
-      columnFilters,
-    },
   });
 
   return (

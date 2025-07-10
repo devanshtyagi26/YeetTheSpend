@@ -4,6 +4,7 @@ import { Chart } from "./Chart";
 import CurrentBalance from "./CurrentBalance";
 import axios from "axios";
 
+// Make sure to modify fetchBudget, fetchData, and fetchMonths to accept setState functions
 function Graphs() {
   const [data, setData] = useState([]);
   const [month, setMonth] = useState("");
@@ -11,11 +12,26 @@ function Graphs() {
   const [total, setTotal] = useState(0);
   const [spent, setSpent] = useState(0);
 
+  // Fetch the available months
+  const fetchMonths = useCallback(async () => {
+    try {
+      const res = await fetch("/api/months");
+      const json = await res.json();
+      setMonths(json.months);
+
+      if (!month && json.months.length > 0) {
+        const latest = json.months[0]; // Assuming sorted desc
+        setMonth(latest);
+      }
+    } catch (err) {
+      console.error("Failed to fetch months", err);
+    }
+  }, [month]);
+
+  // Fetch Budget Data
   const fetchBudget = useCallback(async (selectedMonth) => {
     try {
-      console.log("Month", selectedMonth);
       const res = await axios.get(`/api/budget/${selectedMonth}`);
-      console.log("res", res.data);
       setTotal(res.data.budget);
       setSpent(res.data.spent);
     } catch (err) {
@@ -23,7 +39,8 @@ function Graphs() {
     }
   }, []);
 
-  const fetchChartData = useCallback(async (selectedMonth) => {
+  // Fetch Chart Data
+  const fetchData = useCallback(async (selectedMonth) => {
     try {
       const res = await fetch(`/api/daily?month=${selectedMonth}`);
       const json = await res.json();
@@ -33,44 +50,25 @@ function Graphs() {
     }
   }, []);
 
-  // Fetch available months once
+  // Fetch months when the component mounts
   useEffect(() => {
-    const fetchMonths = async () => {
-      try {
-        const res = await fetch("/api/months");
-        const json = await res.json();
-        setMonths(json.months);
-
-        if (!month && json.months.length > 0) {
-          const latest = json.months[0]; // Assuming sorted desc
-          setMonth(latest);
-        }
-      } catch (err) {
-        console.error("Failed to fetch months", err);
-      }
-    };
-
     fetchMonths();
-  }, []);
+  }, [fetchMonths]);
 
   // Fetch data when month changes
   useEffect(() => {
     if (month) {
       fetchBudget(month);
-      fetchChartData(month);
+      fetchData(month);
     }
-  }, [month, fetchBudget, fetchChartData]);
+  }, [month, fetchBudget, fetchData]);
 
   if (!month || months.length === 0) {
-    return (
-      <div className="border rounded-xl border-accent flex flex-col p-1 w-fit h-fit">
-        Loading budget data...
-      </div>
-    );
+    return <div>Loading budget data...</div>;
   }
 
   return (
-    <div className="border rounded-xl border-accent flex justify-center items-center w-[60vw] h-fit gap-1.5 mt-10 relative shadow-card-foreground shadow-2xl">
+    <>
       <select
         value={month}
         onChange={(e) => setMonth(e.target.value)}
@@ -90,8 +88,9 @@ function Graphs() {
         <Chart month={month} data={data} />
       </div>
       <CurrentBalance total={total} spent={spent} />
-    </div>
+    </>
   );
 }
 
 export default Graphs;
+export { fetchMonths, fetchBudget, fetchData };

@@ -15,17 +15,17 @@ function CurrentBalance({ total, spent }) {
   return (
     <div className="flex px-4 py-1 w-fit h-fit gap-1.5">
       <div>
-        <p className="text-2xl montserrat-medium ">Budget</p>
+        <p className="md:text-2xl text-xl montserrat-medium ">Budget</p>
         <CircularProgressColorDemo total={total} spent={spent} />
         <div className="flex items-center justify-between font-bold">
           <div className="flex flex-col justify-center items-center">
-            <p className="text-[1.3rem] relative top-1.5">
+            <p className="md:text-[1.3rem] text-[1.2rem] relative top-1.5">
               {renderLabel(total)}
             </p>
             <p className="text-xs font-medium text-red-500">Monthly Total</p>
           </div>
           <div className="flex flex-col justify-center items-center">
-            <p className="text-[1.3rem] relative top-1.5">
+            <p className="md:text-[1.3rem] text-[1.2rem] relative top-1.5">
               {renderLabel(total - spent)}
             </p>
             <p className="text-xs font-medium text-red-500">Remaining</p>

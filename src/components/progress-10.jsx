@@ -69,7 +69,7 @@ const CircularProgress = ({
             "absolute inset-0 flex flex-col items-center justify-center font-bold"
           )}
         >
-          <span className="text-3xl relative top-1.5">
+          <span className="md:text-3xl text-[1.3rem] relative top-1.5">
             {renderLabel ? renderLabel(spent) : spent}
           </span>
 
@@ -81,7 +81,33 @@ const CircularProgress = ({
 };
 
 export default function CircularProgressColorDemo({ total, spent }) {
-  const size = 250;
+  const [size, setSize] = useState(250); // Default size for larger screens
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    // Function to check window size
+    const checkIfMobile = () => {
+      if (window.innerWidth <= 640) {
+        setSize(200); // Smaller size on mobile
+        setIsMobile(true);
+      } else {
+        setSize(250); // Default size on larger screens
+        setIsMobile(false);
+      }
+    };
+
+    // Add resize event listener
+    window.addEventListener("resize", checkIfMobile);
+
+    // Check on initial render
+    checkIfMobile();
+
+    // Cleanup on unmount
+    return () => {
+      window.removeEventListener("resize", checkIfMobile);
+    };
+  }, []); // Empty dependency array to run only once on mount
+
   console.log(total, spent);
   if (total === 0) {
     return <></>;

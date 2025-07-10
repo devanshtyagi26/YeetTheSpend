@@ -83,7 +83,7 @@ function Graphs() {
           </option>
         ))}
       </select>
-      <div className="flex h-fit w-[40rem]">
+      <div className="flex h-fit md:w-[40rem] w-fit">
         {console.log("total", total, "data", data)}
         <Chart month={month} data={data} />
       </div>

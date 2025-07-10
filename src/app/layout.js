@@ -24,8 +24,10 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={`${mont.variable} antialiased`}>
-        <div className="bg-destructive flex justify-start items-center w-[100vw] h-[10vh] p-1.5 text-accent font-bold text-3xl pl-[2rem]">
+      <body
+        className={`${mont.variable} antialiased md:overflow-hidden overflow-scroll`}
+      >
+        <div className="bg-destructive flex justify-start items-center w-[100vw] md:h-[10vh] h-[6vh] p-1.5 text-accent font-bold md:text-3xl text-2xl md:pl-[2rem] pl-[1rem] sticky montserrat-medium">
           YeetTheSpend
         </div>
         <div className="grid grid-cols-[5rem_auto] gap-4">

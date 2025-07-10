@@ -97,7 +97,9 @@ export default function CircularProgressColorDemo({ total, spent }) {
           strokeWidth={size / 6}
           showLabel={true}
           renderLabel={(spent) => {
+            if (spent == null || isNaN(spent)) return "Rs. 0";
             return `Rs. ${spent
+              .toFixed(0)
               .toString()
               .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
           }}

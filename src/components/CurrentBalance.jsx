@@ -4,8 +4,13 @@ import CircularProgressColorDemo from "./progress-10";
 import axios from "axios";
 
 export function renderLabel(num) {
-  return `Rs. ${num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
+  if (num == null || isNaN(num)) return "Rs. 0";
+  return `Rs. ${num
+    .toFixed(0)
+    .toString()
+    .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
 }
+
 function CurrentBalance({ total, spent }) {
   return (
     <div className="flex px-4 py-1 w-fit h-fit gap-1.5">

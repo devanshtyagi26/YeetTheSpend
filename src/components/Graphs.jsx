@@ -1,7 +1,6 @@
 "use client";
 import React, { useEffect, useState, useCallback } from "react";
 import { Chart } from "./Chart";
-import CircularProgressColorDemo from "./progress-10";
 import CurrentBalance from "./CurrentBalance";
 import axios from "axios";
 
@@ -12,39 +11,57 @@ function Graphs() {
   const [total, setTotal] = useState(0);
   const [spent, setSpent] = useState(0);
 
-  const fetchBudget = useCallback(async () => {
+  const fetchBudget = useCallback(async (selectedMonth) => {
     try {
-      const res = await axios.get("/api/budget");
-      console.log(res.data.budget);
+      console.log("Month", selectedMonth);
+      const res = await axios.get(`/api/budget/${selectedMonth}`);
+      console.log("res", res.data);
       setTotal(res.data.budget);
       setSpent(res.data.spent);
     } catch (err) {
-      console.error("Error fetching message settings");
+      console.error("Error fetching budget", err);
     }
   }, []);
 
-  useEffect(() => {
-    fetchBudget();
-  }, [fetchBudget]);
+  const fetchChartData = useCallback(async (selectedMonth) => {
+    try {
+      const res = await fetch(`/api/daily?month=${selectedMonth}`);
+      const json = await res.json();
+      setData(json.chartData);
+    } catch (err) {
+      console.error("Failed to fetch chart data", err);
+    }
+  }, []);
 
+  // Fetch available months once
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchMonths = async () => {
       try {
-        const res = await fetch(`/api/daily?month=${month || "latest"}`);
+        const res = await fetch("/api/months");
         const json = await res.json();
+        setMonths(json.months);
 
-        setData(json.chartData);
-        setMonths(json.availableMonths);
-        if (!month) setMonth(json.availableMonths[0]); // default to latest
+        if (!month && json.months.length > 0) {
+          const latest = json.months[0]; // Assuming sorted desc
+          setMonth(latest);
+        }
       } catch (err) {
-        console.error("Failed to fetch chart data", err);
+        console.error("Failed to fetch months", err);
       }
     };
 
-    fetchData();
-  }, [month]);
+    fetchMonths();
+  }, []);
 
-  if (total === 0 || data.length < 0 || months.length < 0) {
+  // Fetch data when month changes
+  useEffect(() => {
+    if (month) {
+      fetchBudget(month);
+      fetchChartData(month);
+    }
+  }, [month, fetchBudget, fetchChartData]);
+
+  if (!month || months.length === 0) {
     return (
       <div className="border rounded-xl border-accent flex flex-col p-1 w-fit h-fit">
         Loading budget data...
@@ -69,6 +86,7 @@ function Graphs() {
         ))}
       </select>
       <div className="flex h-fit w-[40rem]">
+        {console.log("total", total, "data", data)}
         <Chart month={month} data={data} />
       </div>
       <CurrentBalance total={total} spent={spent} />

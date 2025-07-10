@@ -22,7 +22,7 @@ const chartConfig = {
 };
 
 export function Chart({ month, data }) {
-  console.log(data);
+  // console.log(data);
   return (
     <Card className="w-[100%] h-[100%] border-0 shadow-none border-r border-accent rounded-none ml-[0.4rem]">
       <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">

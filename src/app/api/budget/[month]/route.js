@@ -1,25 +1,28 @@
 import dbConnect from "@/lib/dbConnect";
 import Transaction from "@/model/Transactions.model";
 import Budget from "@/model/Budget.model";
+import { NextResponse } from "next/server";
 
-export async function GET(req) {
+export async function GET(_, context) {
   await dbConnect();
 
+  const { params } = await context;
+  const monthKey = params.month; // e.g., 2025-07
+
+  if (!/^\d{4}-\d{2}$/.test(monthKey)) {
+    return NextResponse.json(
+      { success: false, error: "Invalid month format. Use YYYY-MM." },
+      { status: 400 }
+    );
+  }
+
   try {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, "0");
-    const monthKey = `${year}-${month}`; // e.g., "2025-07"
-
-    // 🧾 Get budget entry
-    const budget = await Budget.findOne({ month: monthKey });
-    // const budgetAmount = budget?.amount || 0;
-
-    // 💸 Sum of all expenses this month
     const startOfMonth = new Date(`${monthKey}-01T00:00:00Z`);
-    const endOfMonth = new Date(`${monthKey}-31T23:59:59Z`); // fine for approx
+    const endOfMonth = new Date(`${monthKey}-31T23:59:59Z`);
 
-    const budgetAmountAgg = await Transaction.aggregate([
+    const budgetDoc = await Budget.findOne({ month: monthKey });
+
+    const incomeAgg = await Transaction.aggregate([
       {
         $match: {
           type: "income",
@@ -33,7 +36,8 @@ export async function GET(req) {
         },
       },
     ]);
-    const totalSpentAgg = await Transaction.aggregate([
+
+    const expenseAgg = await Transaction.aggregate([
       {
         $match: {
           type: "expense",
@@ -48,17 +52,18 @@ export async function GET(req) {
       },
     ]);
 
-    const totalSpent = totalSpentAgg[0]?.totalSpent || 0;
-    const budgetAmount = budgetAmountAgg[0]?.totalGained || 0;
+    const totalIncome = incomeAgg[0]?.totalGained || 0;
+    const totalSpent = expenseAgg[0]?.totalSpent || 0;
 
-    return Response.json({
+    return NextResponse.json({
       success: true,
       month: monthKey,
-      budget: budgetAmount,
+      budget: totalIncome,
       spent: totalSpent,
+      manualBudget: budgetDoc?.amount || null,
     });
   } catch (err) {
-    return Response.json(
+    return NextResponse.json(
       { success: false, error: err.message },
       { status: 500 }
     );

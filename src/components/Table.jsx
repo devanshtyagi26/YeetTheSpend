@@ -1,5 +1,5 @@
 "use client";
-import * as React from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import {
   flexRender,
   getCoreRowModel,
@@ -32,7 +32,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-const data = [
+const datsdfa = [
   {
     _id: "6869095d6d79e1dd05020df9",
     amount: 1300,
@@ -196,24 +196,101 @@ export const columns = [
 
 // Filter function to only show transactions for the selected month
 const filterByMonth = (data, month) => {
+  if (!data || !Array.isArray(data)) {
+    console.error("Invalid data:", data);
+    return []; // Return empty if data is invalid
+  }
+
+  if (!month) {
+    console.error("Month is not defined:", month);
+    return data; // Return original data if no month is passed
+  }
+
+  console.log("Filtering for month:", month);
+
   return data.filter((item) => {
-    const transactionMonth = item.date.slice(0, 7); // Get "YYYY-MM" from the date
-    return transactionMonth === month; // Only return transactions for the given month
+    const transactionMonth = item.date.slice(0, 7); // Get "YYYY-MM"
+    console.log("Comparing:", transactionMonth, "with", month);
+    return transactionMonth === month; // Only return transactions for the selected month
   });
 };
 
 export default function DataTable({ month }) {
   console.log("Table Month", month);
+  const [data, setData] = useState([]);
   const [sorting, setSorting] = React.useState([]);
   const [columnVisibility, setColumnVisibility] = React.useState({});
   const [rowSelection, setRowSelection] = React.useState({});
+
+  // Fetch Chart Data
+  const fetchData = async (selectedMonth) => {
+    try {
+      const res = await fetch(
+        `/api/daily?month=${selectedMonth}&filterPositive=true`
+      );
+      const json = await res.json();
+      console.log("API Response:", json); // Log response data
+      const chartData = json.chartData;
+
+      // Check if the data exists and is an array
+      if (!Array.isArray(chartData)) {
+        console.error("Expected chartData to be an array, got:", chartData);
+        return [];
+      }
+
+      const mappedData = chartData.flatMap((entry) => {
+        return [
+          {
+            date: entry.date,
+            type: "income",
+            description: "Income",
+            category: "General",
+            amount: entry.income,
+          },
+          {
+            date: entry.date,
+            type: "expense",
+            description: "Expense",
+            category: "General",
+            amount: entry.expense,
+          },
+        ];
+      });
+
+      console.log("Mapped Data:", mappedData); // Check if data is mapped correctly
+      return mappedData;
+    } catch (err) {
+      console.error("Failed to fetch chart data", err);
+      return [];
+    }
+  };
+
+  useEffect(() => {
+    if (month) {
+      console.log("Fetching data for month:", month); // Log to check the month
+      fetchData(month).then((mappedData) => {
+        console.log("Mapped Data received:", mappedData); // Check the mapped data
+        setData(mappedData);
+      });
+    } else {
+      console.error("Month is undefined or null");
+    }
+  }, [month]);
+
+  useEffect(() => {
+    console.log("Updated data:", data);
+  }, [data]); // This will log whenever `data` is updated
 
   const [columnFilters, setColumnFilters] = React.useState([
     { id: "type", value: "" }, // Default empty filter
   ]);
 
   // Ensure filteredData is never undefined, fallback to an empty array
-  const filteredData = React.useMemo(() => filterByMonth(data, month), [month]);
+  const filteredData = React.useMemo(
+    () => filterByMonth(data, month),
+    [data, month]
+  );
+  console.log("Filtered Data:", filteredData);
 
   const table = useReactTable({
     data: filteredData, // <-- Use 'filteredData' here, not 'filteredData' directly in 'columns'
@@ -240,7 +317,7 @@ export default function DataTable({ month }) {
     <div className="w-full">
       <div className="flex items-center gap-2 py-4">
         <Input
-          placeholder="Filter emails..."
+          placeholder="Filter Items..."
           value={table.getColumn("description")?.getFilterValue() ?? ""}
           onChange={(event) =>
             table.getColumn("description")?.setFilterValue(event.target.value)
@@ -328,12 +405,10 @@ export default function DataTable({ month }) {
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {console.log("Log", table.getRowModel().rows.length)}
+            {table.getRowModel().rows.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
+                <TableRow key={row.id}>
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
                       {flexRender(

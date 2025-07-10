@@ -10,7 +10,7 @@ export default function Toggle() {
 
   return (
     <>
-      <div className="flex flex-col w-[95%] self-center justify-self-center h-fit gap-[2rem]">
+      <div className="flex flex-col justify-self-center h-fit gap-[1rem]">
         {/* Toggle Button */}
         <div className="flex items-center gap-2 mb-4">
           <Button variant="outline" onClick={() => setShowGraphs(!showGraphs)}>

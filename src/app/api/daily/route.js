@@ -5,6 +5,7 @@ export async function GET(req) {
   await dbConnect();
   const { searchParams } = new URL(req.url);
   const monthParam = searchParams.get("month");
+  const filterPositive = searchParams.get("filterPositive") === "true"; // New filter parameter
 
   if (!monthParam) {
     return Response.json(
@@ -51,7 +52,14 @@ export async function GET(req) {
       }
     });
 
-    const chartData = Object.values(dailyMap);
+    let chartData = Object.values(dailyMap);
+
+    // 🔹 Filter out days where both income and expense are zero if `filterPositive` is true
+    if (filterPositive) {
+      chartData = chartData.filter(
+        (entry) => entry.income > 0 || entry.expense > 0
+      );
+    }
 
     // 🔹 Get all available months
     const allMonthsAgg = await Transaction.aggregate([

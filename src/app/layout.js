@@ -1,5 +1,6 @@
 import { Geist, Geist_Mono, Montserrat } from "next/font/google";
 import "./globals.css";
+import Navbar from "@/components/Navbar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,7 +24,15 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={`${mont.variable} antialiased`}>{children}</body>
+      <body className={`${mont.variable} antialiased`}>
+        <div className="bg-destructive flex justify-start items-center w-[100vw] h-[10vh] p-1.5 text-accent font-bold text-3xl pl-[2rem]">
+          YeetTheSpend
+        </div>
+        <div className="grid grid-cols-[5rem_auto] gap-4">
+          <Navbar />
+          {children}
+        </div>
+      </body>
     </html>
   );
 }

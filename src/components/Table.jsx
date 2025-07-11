@@ -315,7 +315,7 @@ export default function DataTable({ month }) {
 
   return (
     <div className="w-full">
-      <div className="flex items-center gap-2 py-4">
+      <div className="grid grid-cols-1 gap-y-2 md:grid-cols-[1fr_auto_auto] md:gap-x-2 items-center gap-2 py-4">
         <Input
           placeholder="Filter Items..."
           value={table.getColumn("description")?.getFilterValue() ?? ""}
@@ -324,65 +324,68 @@ export default function DataTable({ month }) {
           }
           className="max-w-sm"
         />
-        <div className="flex items-center gap-2 py-4">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="ml-auto">
-                Filter by Type <ChevronDown />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Filter by Type</DropdownMenuLabel>
-              <DropdownMenuItem
-                onClick={() =>
-                  setColumnFilters([{ id: "type", value: "income" }])
-                }
-              >
-                Income
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() =>
-                  setColumnFilters([{ id: "type", value: "expense" }])
-                }
-              >
-                Expense
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={() => setColumnFilters([{ id: "type", value: "" }])}
-              >
-                Clear Filter
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+        <div class="flex gap-2 md:contents">
+          <div className="flex items-center gap-2 py-4 md:w-auto">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="ml-auto">
+                  Filter by Type <ChevronDown />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Filter by Type</DropdownMenuLabel>
+                <DropdownMenuItem
+                  onClick={() =>
+                    setColumnFilters([{ id: "type", value: "income" }])
+                  }
+                >
+                  Income
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() =>
+                    setColumnFilters([{ id: "type", value: "expense" }])
+                  }
+                >
+                  Expense
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={() => setColumnFilters([{ id: "type", value: "" }])}
+                >
+                  Clear Filter
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+          <div className="flex items-center gap-2 py-4 md:w-auto">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="ml-auto">
+                  Columns <ChevronDown />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {table
+                  .getAllColumns()
+                  .filter((column) => column.getCanHide())
+                  .map((column) => {
+                    return (
+                      <DropdownMenuCheckboxItem
+                        key={column.id}
+                        className="capitalize"
+                        checked={column.getIsVisible()}
+                        onCheckedChange={(value) =>
+                          column.toggleVisibility(!!value)
+                        }
+                      >
+                        {column.id}
+                      </DropdownMenuCheckboxItem>
+                    );
+                  })}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
-
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
-              Columns <ChevronDown />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => {
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                );
-              })}
-          </DropdownMenuContent>
-        </DropdownMenu>
       </div>
       <div className="rounded-md border">
         <Table>

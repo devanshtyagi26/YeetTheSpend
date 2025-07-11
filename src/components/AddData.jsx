@@ -3,6 +3,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import CurrentBalance from "./CurrentBalance";
 import axios from "axios";
 import Transactions from "./Transactions";
+import { Button } from "./ui/button";
 
 function AddData() {
   const [data, setData] = useState([]);
@@ -82,11 +83,22 @@ function AddData() {
           </option>
         ))}
       </select>
-      <div className="w-[100%] h-[100%]">
-        <Transactions />
+      <div className="flex">
+        <div className="w-[100%] h-[100%]">
+          <Transactions />
+        </div>
+        <div>
+          <CurrentBalance total={total} spent={spent} />
+        </div>
       </div>
-      <div>
-        <CurrentBalance total={total} spent={spent} />
+      <div className="flex items-center gap-2 md:mb-4">
+        <Button
+          className="bg-accent-foreground text-accent"
+          variant="outline"
+          onClick={() => {}}
+        >
+          Add Items
+        </Button>
       </div>
     </>
   );

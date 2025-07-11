@@ -324,7 +324,7 @@ export default function DataTable({ month }) {
           }
           className="max-w-sm"
         />
-        <div class="flex gap-2 md:contents">
+        <div className="flex gap-2 md:contents">
           <div className="flex items-center gap-2 py-4 md:w-auto">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

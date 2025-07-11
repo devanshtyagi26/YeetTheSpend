@@ -8,25 +8,26 @@ import {
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
 import { cn } from "@/lib/utils";
-import { Home, Rss, Settings, User } from "lucide-react";
+import { ChartSpline, NotebookPen, Settings, User } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 
 const navigationMenuItems = [
-  { title: "Home", href: "/", icon: Home },
-  { title: "Charts", href: "/charts", icon: Rss },
+  { title: "Add", href: "/", icon: NotebookPen },
+  { title: "Charts", href: "/charts", icon: ChartSpline },
   { title: "Account", href: "/account", icon: Settings },
   { title: "Settings", href: "/settings", icon: User },
 ];
 
 export default function NavigationMenuMobile() {
-  // Retrieve active index from localStorage (default is 0 if not found)
-  const getStoredActiveIndex = () => {
-    const savedIndex = localStorage.getItem("activeIndex");
-    return savedIndex ? JSON.parse(savedIndex) : 0;
-  };
+  const [activeIndex, setActiveIndex] = useState(0); // default is 0
 
-  const [activeIndex, setActiveIndex] = useState(getStoredActiveIndex); // Initialize with saved state
+  useEffect(() => {
+    const savedIndex = localStorage.getItem("activeIndex");
+    if (savedIndex !== null) {
+      setActiveIndex(JSON.parse(savedIndex));
+    }
+  }, []);
 
   useEffect(() => {
     // Save the active index to localStorage whenever it changes

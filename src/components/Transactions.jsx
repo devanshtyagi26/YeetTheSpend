@@ -83,7 +83,7 @@ function Transactions() {
         ))}
       </select>
 
-      <div className="flex flex-col w-[98%] h-[98%]">
+      <div className="flex flex-col w-[98%] h-[98%] p-2">
         <span>Your Transaction History</span>
         <DataTable data={data} month={month} />
       </div>

@@ -24,7 +24,7 @@ const chartConfig = {
 export function Chart({ month, data }) {
   // console.log(data);
   return (
-    <Card className="w-[22rem] h-[100%] border-0 shadow-none md:border-r md:border-accent md:border-b-0 border-b-2 rounded-none ml-[0.4rem]">
+    <Card className="md:w-[39rem] w-[22rem] h-[100%] border-0 shadow-none md:border-r md:border-accent md:border-b-0 border-b-2 rounded-none ml-[0.4rem]">
       <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
         <CardTitle>{month} – Daily Finances</CardTitle>
       </CardHeader>
